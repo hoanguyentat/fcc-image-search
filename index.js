@@ -5,24 +5,36 @@ var MongoClient = require('mongodb').MongoClient;
 var MONGODB_URI = process.env.MONGOLAB_URI || "mongodb://localhost:27017/test";
 var PORT = (process.env.PORT || 5000);
 var API_KEY = process.env.API_KEY;
-var API_URL = "https://pixabay.com/api/?key=" + API_KEY + "&q=";
 var searches = null;
 
 var app = express();
 
 app.get("/api/imagesearch/:search", function (req, res) {
+	var search = req.params.search;
+
 	// save search in database
-	var term = decodeURIComponent(req.params.search);
+	var term = decodeURIComponent(search);
 	var when = new Date();
 	searches.insert({term: term, when: when});
 
 	// get 10 images with api
-	var url = API_URL + req.params.search;
+	var offset = req.query.offset || 1;
+	var url = "https://pixabay.com/api/?key=" + API_KEY + "&per_page=10&image_type=photo&page=" + offset + "&q=" + search;
 	request({
 		url: url,
 		json: true
-	}, function (err, res2, body) {
-		res.json(body);//TODO: test this
+	}, function (err, response, body) {
+		if (err) {
+			console.error(err);
+			return res.status(500).end(err.message);
+		}
+		res.json(body.hits.map(function (el) {
+			return {
+				alt: el.tags,
+				page: el.pageURL,
+				image: el.webformatURL
+			};
+		}));
 	});
 });
 
@@ -33,12 +45,17 @@ app.get("/api/latest/imagesearch/", function (req, res) {
 			console.error(err);
 			return res.status(500).end(err.message);
 		}
-		res.json(results);
+		res.json(results.map(function (el) {
+			return {
+				term: el.term,
+				when: el.when
+			};
+		}));
 	});
 });
 
-app.get(function (req, res) {
-	res.status(404).end("Error 404:" + req.path + " Not Found");
+app.get("*", function (req, res) {
+	res.status(404).end("Error 404: '" + req.path + "' Not Found");
 });
 
 MongoClient.connect(MONGODB_URI, function (err, mongodb) {
