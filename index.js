@@ -1,10 +1,9 @@
 var express = require('express');
-var request = require('request');
+var Bing = require('node-bing-api')({accKey: process.env.API_KEY});
 var MongoClient = require('mongodb').MongoClient;
 
 var MONGODB_URI = process.env.MONGOLAB_URI || "mongodb://localhost:27017/test";
 var PORT = (process.env.PORT || 5000);
-var API_KEY = process.env.API_KEY;
 var searches = null;
 
 var app = express();
@@ -18,21 +17,18 @@ app.get("/api/imagesearch/:search", function (req, res) {
 	searches.insert({term: term, when: when});
 
 	// get 10 images with api
-	var offset = req.query.offset || 1;
-	var url = "https://pixabay.com/api/?key=" + API_KEY + "&per_page=10&image_type=photo&page=" + offset + "&q=" + search;
-	request({
-		url: url,
-		json: true
-	}, function (err, response, body) {
+	var offset = req.query.offset || 0;
+
+	Bing.images(term, {top: 10, skip: offset}, function (err, response, body) {
 		if (err) {
 			console.error(err);
 			return res.status(500).end(err.message);
 		}
-		res.json(body.hits.map(function (el) {
+		res.json(body.d.results.map(function (el) {
 			return {
-				alt: el.tags,
-				page: el.pageURL,
-				image: el.webformatURL
+				alt: el.Title,
+				page: el.SourceUrl,
+				image: el.MediaUrl
 			};
 		}));
 	});
