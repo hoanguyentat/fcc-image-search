@@ -1,5 +1,5 @@
 {
-  "name": "freecodecamp-",
+  "name": "freecodecamp",
   "version": "1.0.0",
   "description": "https://www.freecodecamp.com/challenges/",
   "main": "index.js",
@@ -7,11 +7,11 @@
     "freecodecamp",
     "heroku"
   ],
-  "author": "TJBrix",
+  "author": "Hola",
   "contributors": [],
   "repository": {
     "type": "git",
-    "url": "https://github.com/UziTech/"
+    "url": "https://github.com/kevinhoa95"
   },
   "license": "MIT",
   "dependencies": {

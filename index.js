@@ -2,7 +2,7 @@ var express = require('express');
 var Bing = require('node-bing-api')({accKey: process.env.API_KEY});
 var MongoClient = require('mongodb').MongoClient;
 
-var MONGODB_URI = process.env.MONGOLAB_URI || "mongodb://localhost:27017/test";
+var MONGODB_URI = process.env.MONGOLAB_URI || "mongodb://kevinhoa95:HolaNguyen1995@ds159348.mlab.com:59348/image";
 var PORT = (process.env.PORT || 5000);
 var searches = null;
 
