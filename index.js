@@ -1,5 +1,6 @@
 var express = require('express');
-var Bing = require('node-bing-api')({accKey: process.env.API_KEY});
+var fs = require("fs")
+var Bing = require('node-bing-api')({accKey: "f1137250d0cc45ee89fb0b323bbe41e0"});
 var MongoClient = require('mongodb').MongoClient;
 
 var MONGODB_URI = process.env.MONGOLAB_URI || "mongodb://kevinhoa95:HolaNguyen1995@ds159348.mlab.com:59348/image";
@@ -8,6 +9,19 @@ var searches = null;
 
 var app = express();
 
+app.get("/", function(req, response) {
+    fs.readFile("index.html", function(err, data){
+       if(err){
+          response.writeHead(404);
+          response.write("Not Found!");
+       }
+       else{
+          response.writeHead(200, {'Content-Type': "text/html"});
+          response.write(data);
+       }
+       response.end();
+    })
+})
 app.get("/api/imagesearch/:search", function (req, res) {
 	var search = req.params.search;
 
